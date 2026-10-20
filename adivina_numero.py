@@ -28,7 +28,7 @@ def choose_difficulty():
         return DIFFICULTIES[choice]
 
     print("Opción inválida. Se usará la dificultad Fácil.")
-    return DIFFICULTIES["2"]
+    return DIFFICULTIES["1"]
 
 
 def read_guess(minimum, maximum):
