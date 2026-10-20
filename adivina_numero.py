@@ -101,24 +101,72 @@ def save_score(scores, player_name, result, difficulty_name):
         "name": player_name,
         "score": result["score"],
         "won": result["won"],
+        "attempts": result["attempts"],
         "difficulty": difficulty_name,
         "played_at": datetime.now(),
     }
     scores.append(record)
-    scores.sort(key=lambda item: item["score"], reverse=True)
+    scores.sort(
+        key=lambda item: (
+            -item["score"],
+            item["attempts"],
+            item["played_at"],
+        )
+    )
     return record
 
 
 def show_leaderboard(scores):
-    print("\n--- Mejores resultados de esta sesión ---")
+    print("\n--- Tabla de posiciones (esta sesión) ---")
+    print(
+        "Orden: puntuación de mayor a menor; en empate, menos intentos y "
+        "después el resultado registrado antes. Si todo coincide, comparten lugar."
+    )
     if len(scores) == 0:
         print("Todavía no hay resultados.")
         return
 
-    for position, result in enumerate(scores[:3], start=1):
+    rows = []
+    previous_tie_breakers = None
+    position = 0
+    for index, result in enumerate(scores):
+        tie_breakers = (
+            result["score"],
+            result["attempts"],
+            result["played_at"],
+        )
+        if tie_breakers != previous_tie_breakers:
+            position = index + 1
+        if position > 3:
+            break
+
+        rows.append(
+            (
+                str(position),
+                result["name"],
+                str(result["score"]),
+                result["difficulty"],
+                str(result["attempts"]),
+            )
+        )
+        previous_tie_breakers = tie_breakers
+
+    headers = ("Lugar", "Jugador", "Puntos", "Dificultad", "Intentos")
+    widths = [
+        max(len(header), *(len(row[index]) for row in rows))
+        for index, header in enumerate(headers)
+    ]
+    print(
+        " | ".join(
+            header.ljust(widths[index]) for index, header in enumerate(headers)
+        )
+    )
+    print("-+-".join("-" * width for width in widths))
+    for row in rows:
         print(
-            f"{position}. {result['name']} — {result['score']} puntos "
-            f"({result['difficulty']})"
+            " | ".join(
+                value.ljust(widths[index]) for index, value in enumerate(row)
+            )
         )
 
 
