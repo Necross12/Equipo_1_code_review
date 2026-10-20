@@ -61,17 +61,20 @@ def play_round(settings):
         f"{settings['maximum']}. Tienes {settings['attempts']} intentos."
     )
 
-    while attempts_used <= settings["attempts"] and won is False:
+    while attempts_used < settings["attempts"] and won is False:
         guess = read_guess(settings["minimum"], settings["maximum"])
-        attempts_used += 1
-
         if guess is None:
             continue
         elif guess < settings["minimum"]:
             print("El número es menor que el rango permitido.")
+            continue
         elif guess > settings["maximum"]:
             print("El número es mayor que el rango permitido.")
-        elif guess < secret_number:
+            continue
+
+        attempts_used += 1
+
+        if guess < secret_number:
             print("Muy bajo.")
         elif guess > secret_number:
             print("Muy alto.")
